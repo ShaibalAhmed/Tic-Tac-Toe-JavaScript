@@ -1,0 +1,177 @@
+    <div class="container">
+      <section class="middle"> 
+        <canvas class="c1" width="85" height="85"></canvas>
+        <canvas class="c2" width="85" height="85"></canvas>
+        <canvas class="c3" width="85" height="85"></canvas><br>
+        <canvas class="c4" width="85" height="85"></canvas>
+        <canvas class="c5" width="85" height="85"></canvas>
+        <canvas class="c6" width="85" height="85"></canvas><br>
+        <canvas class="c7" width="85" height="85"></canvas>
+        <canvas class="c8" width="85" height="85"></canvas>
+        <canvas class="c9" width="85" height="85"></canvas>
+      </section>
+    </div>
+    <style>
+    .container 
+    {
+      display: flex;              /* Firefox, Chrome, IE */
+      -webkit-flex-flow: row;
+      flex-flow: row;
+      -webkit-justify-content: center;
+      justify-content: center;
+      height: 400px;
+    }
+    .middle 
+    {
+      -webkit-flex: 0 0 350px;     /* grow | shrink | basis */
+      flex: 0 0 350px;
+      text-align: center;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    section 
+    {
+      padding: 7px;
+      margin: 5px;
+    }
+    .x
+     {
+      color: green;
+      font-weight: bold;
+     }
+    .o 
+    {
+      color: #ff3399;
+      font-weight: bold;
+    }  
+    canvas 
+    {
+      border: 1px solid black; /*background-color: #fff;*/
+    }
+    .winner 
+    {
+      background-color: #ff6;
+    }
+    </style>
+    <script>
+
+    var activePlayer = "X";    // Track whos turn it is (either X or O).  X starts first.
+    var moves = [];            // Track the moves on the tic-tac-toe grid
+    var ticTacToeCells = document.querySelectorAll("canvas");     // Store the cells of the tic-tac-toe board
+    var winningCombinations = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8],
+      [6,4,2],
+      [0,3,6],
+      [1,4,7],
+      [2,5,8],
+      [0,4,8]
+    ];
+
+    // Draw an X or O in the clicked cell
+    function draw(cellIndex) { 
+      if (isBlank(cellIndex)) {
+       
+        moves[cellIndex] = activePlayer;          // Track each player's moves
+        var cell = ticTacToeCells[cellIndex];
+        if (activePlayer == "X") {
+          drawX(cell);
+        } else {
+          drawO(cell);
+        }
+        if (isWinner(activePlayer)) {
+          gameOver(activePlayer + " has won!"); 
+        } else if (isTie()) {
+          gameOver("It's a draw, try again!");
+        } else {
+          
+          activePlayer = (activePlayer === "X") ? "O" : "X";        // It's the other players turn
+        }     }     }
+
+      function gameOver(message) {
+      // Pause the game for a 1/2 second before displaying the game over message
+      setTimeout(function() {
+        alert(message);
+        reset();
+        activePlayer = (activePlayer === "X") ? "O" : "X";
+      }, 500);}
+
+      function drawX(cell) {
+      var context = cell.getContext("2d");
+      context.moveTo(10,10);
+      context.lineTo(75,75);
+      context.moveTo(10,75);
+      context.lineTo(75,10);
+      context.strokeStyle = 'green';
+      context.lineWidth = 5;
+      context.stroke();}
+
+      function drawO(cell) {
+      var context = cell.getContext("2d");
+      context.beginPath();
+      context.arc(43,43,30,0,2*Math.PI);
+      context.strokeStyle = '#ff3399';
+      context.lineWidth = 5;
+      context.stroke();
+    }
+
+      function isBlank(cellIndex) {
+      if (moves[cellIndex] === undefined) {
+        return true;
+      } else {
+        return false;
+      }}
+
+      function isWinner(player) {
+      for (var i = 0; i < winningCombinations.length; i++) {
+        if (moves[winningCombinations[i][0]] == player &&
+           moves[winningCombinations[i][1]] == player &&
+           moves[winningCombinations[i][2]] == player) {
+           highlightWinningCombo(winningCombinations[i]);
+           return true;
+        } }
+      return false;
+    }
+
+      function isTie() {
+      for (var i = 0; i < 9; i++) {
+        console.log("moves[" + i + "]=" + moves[i]);
+        if (typeof moves[i] == 'undefined' || null === moves[i] ) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+       function highlightWinningCombo(winningCombo) {
+      for (var i = 0; i < winningCombo.length; i++) {
+        var cell = ticTacToeCells[winningCombo[i]];
+        cell.classList.add("winner");
+      }
+    }
+
+  function reset() {
+      for (var i = 0; i <= moves.length; i++) {
+        if (moves[i] !== undefined) {
+          // Erase the cells that have X or O
+          var cell = ticTacToeCells[i];
+          var context = cell.getContext("2d");
+          context.beginPath();
+          context.clearRect(0, 0, cell.width, cell.height);
+          cell.classList.remove("winner");
+        }
+      }
+      moves = [];         // Reset the moves array
+    }
+
+    // Add a click handler for each of our tic-tac-toe boxes
+    for (var i = 0; i < ticTacToeCells.length; i++) {
+        addClickHandler(ticTacToeCells[i], i);
+    }
+    function addClickHandler(canvas, index) {
+        canvas.addEventListener("click", function() {
+            draw(index);
+        }, false);
+    }
+    </script>
